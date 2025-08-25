@@ -3,6 +3,8 @@ extends Action
 
 
 func perform() -> bool:
+	
+	# Entity must be on stairs to use
 	if entity.grid_position == get_map_data().down_stairs_location:
 		SignalBus.player_descended.emit()
 		MessageLog.send_message("You descend the staircase.", GameColors.DESCEND)

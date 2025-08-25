@@ -8,7 +8,7 @@ func _init(entity: Entity, item: Entity) -> void:
 	super._init(entity)
 	_item = item
 
-
+# Equips or unequips item
 func perform() -> bool:
 	entity.equipment_component.toggle_equip(_item)
 	return true

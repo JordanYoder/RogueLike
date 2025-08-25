@@ -10,6 +10,7 @@ var player: Entity
 @onready var defense_upgrade_button: Button = $"%DefenseUpgradeButton"
 
 
+# The options presented to the user during level ujp
 func setup(player: Entity) -> void:
 	self.player = player
 	var fighter: FighterComponent = player.fighter_component
@@ -19,17 +20,21 @@ func setup(player: Entity) -> void:
 	health_upgrade_button.grab_focus()
 
 
+# Increase max hp
 func _on_health_upgrade_button_pressed() -> void:
 	player.level_component.increase_max_hp()
 	queue_free()
 	level_up_completed.emit()
 
+
+# Increase power
 func _on_power_upgrade_button_pressed() -> void:
 	player.level_component.increase_power()
 	queue_free()
 	level_up_completed.emit()
 
 
+# Increase defense
 func _on_defense_upgrade_button_pressed() -> void:
 	player.level_component.increase_defense()
 	queue_free()

@@ -52,73 +52,98 @@ func _init(map_data: MapData, start_position: Vector2i, key: String = "") -> voi
 
 func set_entity_type(key: String) -> void:
 	self.key = key
+	
+	# Load the entity type from const entity_type dictionary
 	var entity_definition: EntityDefinition = load(entity_types[key])
 	_definition = entity_definition
-	type = _definition.type
-	blocks_movement = _definition.is_blocking_movment
-	entity_name = _definition.name
-	texture = entity_definition.texture
-	modulate = entity_definition.color
 	
+	# Set basic attributes of entity
+	type = _definition.type                            # Get the type of entity
+	blocks_movement = _definition.is_blocking_movment  # Get if entity can block movement
+	entity_name = _definition.name                     # Get entity name
+	texture = entity_definition.texture                # Get entity texture
+	modulate = entity_definition.color                 # Get entity color
+	
+	
+	# If the AIType is hostile add that component
 	match entity_definition.ai_type:
 		AIType.HOSTILE:
 			ai_component = HostileEnemyAIComponent.new()
 			add_child(ai_component)
 	
+	# If the entity definition is a fighter add that component
 	if entity_definition.fighter_definition:
 		fighter_component = FighterComponent.new(entity_definition.fighter_definition)
 		add_child(fighter_component)
-		
+	
 	var item_definition: ItemComponentDefinition = entity_definition.item_definition
 	if item_definition:
+		# Decide what kind of consumable this is (lightning, heal, etc) and apply its component
 		if item_definition is ConsumableComponentDefinition:
 			_handle_consumable(item_definition)
+		
+		# If the entity is equippable add the equippable component
 		else:
 			equippable_component = EquippableComponent.new(item_definition)
 	
+	# If it has an inventory_capacity > 0 add the inventory component
 	if entity_definition.inventory_capacity > 0:
 		inventory_component = InventoryComponent.new(entity_definition.inventory_capacity)
 		add_child(inventory_component)
 	
+	# If entity has levellint info add the level component
 	if entity_definition.level_info:
 		level_component = LevelComponent.new(entity_definition.level_info)
 		add_child(level_component)
 	
-	
+	# If the entity has equipment add the equipment component
 	if entity_definition.has_equipment:
 		equipment_component = EquipmentComponent.new()
 		add_child(equipment_component)
 		equipment_component.entity = self
 
-
+# Move entity
 func move(move_offset: Vector2i) -> void:
+	# Turn off blocking attribute
 	map_data.unregister_blocking_entity(self)
+	
+	# Perform the movement
 	grid_position += move_offset
+	
+	# Turn on blocking attribute
 	map_data.register_blocking_entity(self)
+	
+	# Sets if this entity is in view
 	visible = map_data.get_tile(grid_position).is_in_view
 
 
+# Distance between two positions
 func distance(other_position: Vector2i) -> int:
 	var relative: Vector2i = other_position - grid_position
 	return maxi(abs(relative.x), abs(relative.y))
 
 
+# Returns if entity blocks movement
 func is_blocking_movement() -> bool:
 	return blocks_movement
 
 
+# Returns entity name
 func get_entity_name() -> String:
 	return entity_name
 
 
+# Return entity type
 func get_entity_type() -> int:
 	return _definition.type
 
 
+# Returns if entity is alive
 func is_alive() -> bool:
 	return ai_component != null
 
 
+# Assign specific component for each component type (healing potion, lightning scroll, etc)
 func _handle_consumable(consumable_definition: ConsumableComponentDefinition) -> void:
 	if consumable_definition is HealingConsumableComponentDefinition:
 		consumable_component = HealingConsumableComponent.new(consumable_definition)

@@ -15,10 +15,16 @@ func _init(turns_remaining: int) -> void:
 
 
 func perform() -> void:
+	
+	# Exit confused  state if no more turns remaining
 	if turns_remaining <= 0:
 		MessageLog.send_message("The %s is no longer confused." % entity.get_entity_name(), Color.WHITE)
+		
+		# Set the AI to the previously stored AI
 		entity.ai_component = previous_ai
 		queue_free()
+		
+	# Pick a random direction
 	else:
 		var direction: Vector2i = [
 			Vector2i(-1, -1),
@@ -31,6 +37,7 @@ func perform() -> void:
 			Vector2i( 1,  1),
 		].pick_random()
 		turns_remaining -= 1
+		
 		return BumpAction.new(entity, direction.x, direction.y).perform()
 
 

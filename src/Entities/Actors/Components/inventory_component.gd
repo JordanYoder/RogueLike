@@ -10,8 +10,12 @@ func _init(capacity: int) -> void:
 	self.capacity = capacity
 
 
+# Drop item from inventory and onto map
 func drop(item: Entity) -> void:
+	# Remove item from inventory
 	items.erase(item)
+	
+	# Add the item to the map
 	var map_data: MapData = get_map_data()
 	map_data.entities.append(item)
 	map_data.entity_placed.emit(item)

@@ -16,7 +16,7 @@ func enter() -> void:
 func exit() -> void:
 	message_panel.self_modulate = Color.WHITE
 
-
+# Scroll through the messages
 func get_action(player: Entity) -> Action:
 	var action: Action
 	

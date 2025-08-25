@@ -12,6 +12,7 @@ defense_bonus = 3
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fy1r7"]
 atlas = ExtResource("3_m2yff")
+region = Rect2(560, 17.7586, 15.3212, 14.2414)
 
 [resource]
 script = ExtResource("1_a8epg")

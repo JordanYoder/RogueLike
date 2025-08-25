@@ -6,15 +6,18 @@ const main_menu_scene: PackedScene = preload("res://src/GUI/MainMenu/main_menu.t
 var current_child: Node
 
 
+# Load the main menu
 func _ready():
 	load_main_menu()
 
 
+# Switch scene to main menu
 func load_main_menu() -> void:
 	var main_menu: MainMenu = switch_to_scene(main_menu_scene)
 	main_menu.game_requested.connect(_on_game_requested)
 
 
+# Switches scene
 func switch_to_scene(scene: PackedScene) -> Node:
 	if current_child != null:
 		current_child.queue_free()
@@ -23,6 +26,7 @@ func switch_to_scene(scene: PackedScene) -> Node:
 	return current_child
 
 
+# Load game or start new game
 func _on_game_requested(try_load: bool) -> void:
 	var game: GameRoot = switch_to_scene(game_scene)
 	game.main_menu_requested.connect(load_main_menu)

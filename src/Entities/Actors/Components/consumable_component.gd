@@ -10,6 +10,7 @@ func activate(action: ItemAction) -> bool:
 	return false
 
 
+# Remove item from inventory
 func consume(consumer: Entity) -> void:
 	var inventory: InventoryComponent = consumer.inventory_component
 	inventory.items.erase(entity)

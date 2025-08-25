@@ -10,34 +10,44 @@ func _init(definition: FireballDamageConsumableComponentDefinition):
 	radius = definition.radius
 
 
+# Activate the fireball scroll
 func activate(action: ItemAction) -> bool:
 	var consumer: Entity = action.entity
 	var target_position: Vector2i = action.target_position
 	var map_data: MapData = consumer.map_data
 	
+	# Entity can not target an area that is not in view
 	if not map_data.get_tile(target_position).is_in_view:
 		MessageLog.send_message("You cannot target an area that you cannot see.", GameColors.IMPOSSIBLE)
 		return false
 	
+	# Get actors in range of the fireball radius
 	var targets := []
 	for actor in map_data.get_actors():
 		if actor.distance(target_position) <= radius:
 			targets.append(actor)
 	
+	# Exit if there are no targets in the radius of the fireball target
 	if targets.is_empty():
 		MessageLog.send_message("There are no targets in the radius.", GameColors.IMPOSSIBLE)
 		return false
+	
+	# Exit if player is only target in the radius of the fireball target
 	if targets.size() == 1 and targets[0] == map_data.player:
 		MessageLog.send_message("There are not enemy targets in the radius.", GameColors.IMPOSSIBLE)
 		return false
 	
+	# Apply damage from the fireball to all actors in the damage radius
 	for target in targets:
 		MessageLog.send_message("The %s is engulfed in a fiery explosion, taking %d damage!" % [target.get_entity_name(), damage], GameColors.PLAYER_ATTACK)
 		target.fighter_component.take_damage(damage)
 	
+	# Remove item from inventory
 	consume(action.entity)
+	
 	return true
 
 
+# Return targeting radius
 func get_targeting_radius() -> int:
 	return radius

@@ -16,6 +16,8 @@ func get_names_at_location(grid_position: Vector2i) -> String:
 	var entity_names := ""
 	var map_data: MapData = map.map_data
 	var tile: Tile = map_data.get_tile(grid_position)
+	
+	# Exit early if not hovering over a tile/tile in view
 	if not tile or not tile.is_in_view:
 		return entity_names
 	var entities_at_location: Array[Entity] = []

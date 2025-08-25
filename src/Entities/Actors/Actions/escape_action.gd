@@ -1,7 +1,7 @@
 class_name EscapeAction
 extends Action
 
-
+# Quit game
 func perform() -> bool:
 	#entity.get_tree().quit()
 	entity.map_data.save()

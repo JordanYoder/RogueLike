@@ -15,6 +15,7 @@ var current_floor: int = 0
 var pathfinder: AStarGrid2D
 
 
+# Sets the map size, the player, and the tiles
 func _init(map_width: int, map_height: int, player: Entity) -> void:
 	width = map_width
 	height = map_height
@@ -23,6 +24,7 @@ func _init(map_width: int, map_height: int, player: Entity) -> void:
 	_setup_tiles()
 
 
+# Creates an array of wall tiles for initialization
 func _setup_tiles() -> void:
 	tiles = []
 	for y in height:
@@ -33,6 +35,7 @@ func _setup_tiles() -> void:
 
 
 
+# Verifies the tile is inbounds
 func is_in_bounds(coordinate: Vector2i) -> bool:
 	return (
 		0 <= coordinate.x
@@ -42,11 +45,13 @@ func is_in_bounds(coordinate: Vector2i) -> bool:
 	)
 
 
+# Gets the tile at x and y coordinate
 func get_tile_xy(x: int, y: int) -> Tile:
 	var grid_position := Vector2i(x, y)
 	return get_tile(grid_position)
 
 
+# Returns index of tile
 func get_tile(grid_position: Vector2i) -> Tile:
 	var tile_index: int = grid_to_index(grid_position)
 	if tile_index == -1:
@@ -54,6 +59,7 @@ func get_tile(grid_position: Vector2i) -> Tile:
 	return tiles[tile_index]
 
 
+# Returns the entity at a specific location if it is blockable
 func get_blocking_entity_at_location(grid_position: Vector2i) -> Entity:
 	for entity in entities:
 		if entity.is_blocking_movement() and entity.grid_position == grid_position:
@@ -61,12 +67,14 @@ func get_blocking_entity_at_location(grid_position: Vector2i) -> Entity:
 	return null
 
 
+# Convert grid to index
 func grid_to_index(grid_position: Vector2i) -> int:
 	if not is_in_bounds(grid_position):
 		return -1
 	return grid_position.y * width + grid_position.x
 
 
+# Pathfinding
 func setup_pathfinding() -> void:
 	pathfinder = AStarGrid2D.new()
 	pathfinder.region = Rect2i(0, 0, width, height)
@@ -81,14 +89,17 @@ func setup_pathfinding() -> void:
 			register_blocking_entity(entity)
 
 
+# Registers the blocking entity
 func register_blocking_entity(entity: Entity) -> void:
 	pathfinder.set_point_weight_scale(entity.grid_position, entity_pathfinding_weight)
 
 
+# Unregisters the blocking entity
 func unregister_blocking_entity(entity: Entity) -> void:
 	pathfinder.set_point_weight_scale(entity.grid_position, 0)
 
 
+# Returns all actors that are still alive on the map
 func get_actors() -> Array[Entity]:
 	var actors: Array[Entity] = []
 	for entity in entities:
@@ -97,6 +108,7 @@ func get_actors() -> Array[Entity]:
 	return actors
 
 
+# Returns array of items (consumable and equippable) that are on the map
 func get_items() -> Array[Entity]:
 	var items: Array[Entity] = []
 	for entity in entities:
@@ -105,6 +117,7 @@ func get_items() -> Array[Entity]:
 	return items
 
 
+# Return the actor at a specific location
 func get_actor_at_location(location: Vector2i) -> Entity:
 	for actor in get_actors():
 		if actor.grid_position == location:
@@ -112,6 +125,7 @@ func get_actor_at_location(location: Vector2i) -> Entity:
 	return null
 
 
+# Save the data to disk
 func save() -> void:
 	var file = FileAccess.open("user://save_game.dat", FileAccess.WRITE)
 	var save_data: Dictionary = get_save_data()
@@ -121,6 +135,7 @@ func save() -> void:
 	file.store_line(save_string)
 
 
+# Load the data from disk
 func load_game() -> bool:
 	var file = FileAccess.open("user://save_game.dat", FileAccess.READ)
 	var retrieved_hash: String = file.get_line()
@@ -134,6 +149,7 @@ func load_game() -> bool:
 	return true
 
 
+# Restore game state
 func restore(save_data: Dictionary) -> void:
 	width = save_data["width"]
 	height = save_data["height"]
@@ -152,7 +168,10 @@ func restore(save_data: Dictionary) -> void:
 		entities.append(new_entity)
 
 
+# Gets the save data for map_data
 func get_save_data() -> Dictionary:
+	
+	# The map data
 	var save_data := {
 		"width": width,
 		"height": height,
@@ -162,10 +181,14 @@ func get_save_data() -> Dictionary:
 		"entities": [],
 		"tiles": []
 	}
+	
+	# Entity data (excluding the player)
 	for entity in entities:
 		if entity == player:
 			continue
 		save_data["entities"].append(entity.get_save_data())
+		
+	# Tile data
 	for tile in tiles:
 		save_data["tiles"].append(tile.get_save_data())
 	return save_data

@@ -3,19 +3,28 @@ extends ActionWithDirection
 
 
 func perform() -> bool:
+	
+	# Get the entity that is being targeted
 	var target: Entity = get_target_actor()
+	
+	# If not a valid target exit early
 	if not target:
 		if entity == get_map_data().player:
 			MessageLog.send_message("Nothing to attack.", GameColors.IMPOSSIBLE)
 		return false
 	
+	# Damage calculation
 	var damage: int = entity.fighter_component.power - target.fighter_component.defense
+	
+	# Message settings
 	var attack_color: Color
 	if entity == get_map_data().player:
 		attack_color = GameColors.PLAYER_ATTACK
 	else:
 		attack_color = GameColors.ENEMY_ATTACK
 	var attack_description: String = "%s attacks %s" % [entity.get_entity_name(), target.get_entity_name()]
+	
+	# Set damage and display message
 	if damage > 0:
 		attack_description += " for %d hit points." % damage
 		MessageLog.send_message(attack_description, attack_color)
@@ -23,4 +32,5 @@ func perform() -> bool:
 	else:
 		attack_description += " but does no damage."
 		MessageLog.send_message(attack_description, attack_color)
+
 	return true
